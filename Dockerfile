@@ -16,5 +16,12 @@ RUN poetry install --no-root --no-interaction
 # Copy the rest of the application code into the container
 COPY . .
 
+# Make run.sh executable
+RUN chmod +x run.sh
+
 # Expose the port the app runs on
 EXPOSE 3000
+
+# Use the run.sh script as the entrypoint
+CMD ["./run.sh"]
+
