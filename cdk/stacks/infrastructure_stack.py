@@ -178,6 +178,13 @@ class InfrastructureStack(Stack):
             ec2.Port.tcp(3000),
             "Allow traffic from ALB"
         )
+
+        # Get created certificate
+        # certificate = acm.Certificate.from_certificate_arn(
+        #     self, "MyCert",
+        #     "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx"
+        # )
+
         
         # Application Load Balanced Fargate Service
         service = ecs_patterns.ApplicationLoadBalancedFargateService(
@@ -186,7 +193,8 @@ class InfrastructureStack(Stack):
             cluster=self.cluster,
             task_definition=task_definition,
             desired_count=config["desired_count"],
-            listener_port=80,
+            listener_port=80, # 443 for https
+            # certificate=certificate, # Assign certificate                      
             public_load_balancer=True,
             platform_version=ecs.FargatePlatformVersion.LATEST,
             security_groups=[alb_security_group],
