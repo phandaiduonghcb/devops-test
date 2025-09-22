@@ -30,7 +30,4 @@ pipeline_stack = PipelineStack(
     env=aws_env
 )
 
-# Pipeline depends on infrastructure
-pipeline_stack.add_dependency(infrastructure_stack)
-
 app.synth()

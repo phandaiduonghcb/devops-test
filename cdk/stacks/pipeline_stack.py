@@ -6,8 +6,9 @@ from aws_cdk import (
     aws_ecr as ecr,
     aws_iam as iam,
     aws_s3 as s3,
+    aws_codestarconnections as codestarconnections,
     RemovalPolicy,
-    SecretValue
+    CfnOutput
 )
 from constructs import Construct
 import json
@@ -25,6 +26,13 @@ class PipelineStack(Stack):
             self.env_configs = json.load(f)
         
         config = self.env_configs.get(env_name, self.env_configs["dev"])
+        
+        # CodeStar Connection for GitHub
+        self.codestar_connection = codestarconnections.CfnConnection(
+            self, f"DevOpsApp-CodeStarConnection-{env_name}",
+            connection_name=f"devops-app-git-conn-{env_name}",
+            provider_type="GitHub"
+        )
         
         # S3 Bucket for artifacts
         self.artifacts_bucket = s3.Bucket(
@@ -48,6 +56,9 @@ class PipelineStack(Stack):
         
         # CodePipeline
         self.pipeline = self._create_pipeline(config)
+        
+        # Add CloudFormation outputs
+        self._add_outputs()
     
     def _create_build_project(self, config):
         """Create CodeBuild project for building and pushing Docker image to ECR"""
@@ -303,14 +314,14 @@ class PipelineStack(Stack):
                 codepipeline.StageProps(
                     stage_name="Source",
                     actions=[
-                        codepipeline_actions.GitHubSourceAction(
-                            action_name="GitHub_Source",
+                        codepipeline_actions.CodeStarConnectionsSourceAction(
+                            action_name="CodeStar_Source",
+                            connection_arn=self.codestar_connection.attr_connection_arn,
                             owner="phandaiduonghcb",  # Replace with your GitHub username
-                            repo="devops-test",         # Replace with your repo name
+                            repo="devops-test",       # Replace with your repo name
                             branch=config["branch"],
-                            oauth_token=SecretValue.secrets_manager("github-token"),
                             output=source_output,
-                            trigger=codepipeline_actions.GitHubTrigger.POLL
+                            trigger_on_push=True
                         )
                     ]
                 ),
@@ -353,3 +364,26 @@ class PipelineStack(Stack):
         )
         
         return pipeline
+    
+    def _add_outputs(self):
+        """Add CloudFormation outputs"""
+        CfnOutput(
+            self, f"CodeStarConnectionArn-{self.env_name}",
+            value=self.codestar_connection.attr_connection_arn,
+            description=f"CodeStar Connection ARN for {self.env_name} environment",
+            export_name=f"DevOpsApp-CodeStarConnectionArn-{self.env_name}"
+        )
+        
+        CfnOutput(
+            self, f"ECRRepositoryUri-{self.env_name}",
+            value=self.ecr_repo.repository_uri,
+            description=f"ECR Repository URI for {self.env_name} environment",
+            export_name=f"DevOpsApp-ECRRepositoryUri-{self.env_name}"
+        )
+        
+        CfnOutput(
+            self, f"PipelineName-{self.env_name}",
+            value=self.pipeline.pipeline_name,
+            description=f"CodePipeline name for {self.env_name} environment",
+            export_name=f"DevOpsApp-PipelineName-{self.env_name}"
+        )
