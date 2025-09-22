@@ -1,0 +1,32 @@
+{
+  "dev": {
+    "branch": "dev",
+    "app_env": "development",
+    "cpu": 256,
+    "memory": 512,
+    "desired_count": 1,
+    "cluster_name": "devops-app-cluster-dev",
+    "service_name": "devops-app-service-dev",
+    "container_name": "devops-app-container"
+  },
+  "staging": {
+    "branch": "stg", 
+    "app_env": "staging",
+    "cpu": 256,
+    "memory": 512,
+    "desired_count": 1,
+    "cluster_name": "devops-app-cluster-staging",
+    "service_name": "devops-app-service-staging",
+    "container_name": "devops-app-container"
+  },
+  "prod": {
+    "branch": "main",
+    "app_env": "production", 
+    "cpu": 256,
+    "memory": 512,
+    "desired_count": 1,
+    "cluster_name": "devops-app-cluster-prod",
+    "service_name": "devops-app-service-prod",
+    "container_name": "devops-app-container"
+  }
+}

@@ -7,3 +7,5 @@ docker
 *.zip
 client_secrets.json
 mycreds.txt
+cdk-env
+**/cdk.out
