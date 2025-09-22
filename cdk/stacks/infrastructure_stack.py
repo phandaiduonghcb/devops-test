@@ -205,7 +205,7 @@ class InfrastructureStack(Stack):
         
         # Configure health check
         service.target_group.configure_health_check(
-            path="/healthcheck" if self.env_name == "prod" else "/",
+            path="/healthcheck",
             healthy_http_codes="200",
             interval=Duration.seconds(30),
             timeout=Duration.seconds(5),

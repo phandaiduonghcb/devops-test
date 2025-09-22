@@ -20,7 +20,5 @@ echo.
 echo Next steps:
 echo 1. Update GitHub repo info in cdk/stacks/pipeline_stack.py
 echo 2. Update environment config in cdk/configs/environments.json  
-echo 3. Create GitHub token secret: aws secretsmanager create-secret --name github-token --secret-string "your-token"
-echo 4. Deploy: python cdk/deploy.py dev [account-id] [region]
 
 pause
